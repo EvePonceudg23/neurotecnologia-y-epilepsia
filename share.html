@@ -2,51 +2,63 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Compartir Proyecto</title>
+  <title>Compartir proyecto</title>
   <style>
-    body {{
-      font-family: sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+    body {
+      font-family: Arial, sans-serif;
       text-align: center;
-      padding: 20px;
-    }}
-    .msg {{
-      font-size: 1.2em;
-      background: #e0f7fa;
-      border: 1px solid #4dd0e1;
-      padding: 1em 2em;
-      border-radius: 10px;
-    }}
+      padding: 50px;
+    }
+    .mensaje {
+      margin-top: 20px;
+      color: green;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-  <div class="msg" id="mensaje">Procesando...</div>
+  <h2>Procesando...</h2>
+  <div class="mensaje" id="mensaje"></div>
+
   <script>
+    // Obtener los parámetros de la URL
     const params = new URLSearchParams(window.location.search);
-    const title = params.get('title') || 'Proyecto';
-    const text = params.get('text') || '';
-    const url = params.get('url') || window.location.href;
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const mensaje = document.getElementById('mensaje');
-    if (isMobile && navigator.share) {{
-      navigator.share({{ title, text, url }})
-        .then(() => {{
-          mensaje.innerText = 'Gracias por compartir 🧠';
-          setTimeout(() => window.close(), 2000);
-        }})
-        .catch(() => {{
-          mensaje.innerText = 'No se pudo compartir 😕';
-        }});
-    }} else {{
-      navigator.clipboard.writeText(url).then(() => {{
-        mensaje.innerText = '🔗 Enlace copiado al portapapeles';
-      }}).catch(() => {{
-        mensaje.innerText = '❌ No se pudo copiar el enlace';
-      }});
-    }}
+    const title = params.get("title") || "Proyecto";
+    const text = params.get("text") || "Conoce este proyecto";
+    const url = params.get("url") || window.location.href;
+
+    // Mensaje de confirmación en escritorio
+    const mostrarMensaje = (texto) => {
+      document.getElementById("mensaje").textContent = texto;
+      document.querySelector("h2").textContent = "¡Listo!";
+    };
+
+    // Función para copiar al portapapeles
+    const copiarAlPortapapeles = async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+        mostrarMensaje("Enlace copiado al portapapeles");
+      } catch (err) {
+        mostrarMensaje("No se pudo copiar el enlace");
+      }
+    };
+
+    // Intentar usar el API de compartir
+    if (navigator.share) {
+      navigator.share({
+        title: title,
+        text: text,
+        url: url
+      }).then(() => {
+        mostrarMensaje("Gracias por compartir");
+      }).catch((error) => {
+        console.error("Error al compartir:", error);
+        mostrarMensaje("No se pudo compartir");
+      });
+    } else {
+      // Si no es compatible (escritorio): copiar enlace
+      copiarAlPortapapeles();
+    }
   </script>
 </body>
 </html>
