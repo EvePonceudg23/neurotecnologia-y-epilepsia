@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Compartir Proyecto</title>
+  <style>
+    body {{
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      padding: 20px;
+    }}
+    .msg {{
+      font-size: 1.2em;
+      background: #e0f7fa;
+      border: 1px solid #4dd0e1;
+      padding: 1em 2em;
+      border-radius: 10px;
+    }}
+  </style>
+</head>
+<body>
+  <div class="msg" id="mensaje">Procesando...</div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const title = params.get('title') || 'Proyecto';
+    const text = params.get('text') || '';
+    const url = params.get('url') || window.location.href;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const mensaje = document.getElementById('mensaje');
+    if (isMobile && navigator.share) {{
+      navigator.share({{ title, text, url }})
+        .then(() => {{
+          mensaje.innerText = 'Gracias por compartir 🧠';
+          setTimeout(() => window.close(), 2000);
+        }})
+        .catch(() => {{
+          mensaje.innerText = 'No se pudo compartir 😕';
+        }});
+    }} else {{
+      navigator.clipboard.writeText(url).then(() => {{
+        mensaje.innerText = '🔗 Enlace copiado al portapapeles';
+      }}).catch(() => {{
+        mensaje.innerText = '❌ No se pudo copiar el enlace';
+      }});
+    }}
+  </script>
+</body>
+</html>
